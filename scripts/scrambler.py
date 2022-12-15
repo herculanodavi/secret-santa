@@ -24,7 +24,10 @@ def groups_shuffle(givers: list[Person]) -> dict[Person, Person]:
 
     while len(assigned_givers) < len(givers) - 1:
         receiver = find_random_match(giver)
+        if receiver is None:
+            return None
         assigned_givers[giver] = receiver
+
         giver = receiver
 
     assigned_givers[giver] = original_giver
