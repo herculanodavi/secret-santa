@@ -13,3 +13,9 @@ class Person:
         return Person(
             j['name'], j['email'], j['pronoun'], set(j['groups'])
         )
+
+    def __hash__(self) -> int:
+        return hash(self.name)
+    
+    def __str__(self) -> str:
+        return self.name
