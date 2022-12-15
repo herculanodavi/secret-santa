@@ -22,7 +22,7 @@ if __name__ == "__main__":
         prog='Secret Santa 2022',
         description='Does a Secret Santa shuffle that guarantees people that the giver knows the receiver.')
     
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
 
     parser.add_argument('-user', required=True)
     parser.add_argument('-password', required=True)

@@ -68,4 +68,4 @@ class DummySender:
         pass
 
     def send_mail(self, sender: Person, receiver: Person):
-        logging.debug(f"Sending from {sender} to {receiver}")
+        logging.info(f"Sending from {sender} to {receiver}")
