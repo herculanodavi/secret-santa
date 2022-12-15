@@ -12,7 +12,7 @@ def main(user, password, input_file):
         people = [Person.from_json(el) for el in j]
         
     server = mail.DummySender(mail.User(user, password))
-    solution = scrambler.scramble(people, 'groups')
+    solution = scrambler.solve(people, 'groups', int(1e6))
     for s in solution:
         server.send_mail(s['giver'], s['receiver'])
 
@@ -22,7 +22,7 @@ if __name__ == "__main__":
         prog='Secret Santa 2022',
         description='Does a Secret Santa shuffle that guarantees people that the giver knows the receiver.')
     
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
 
     parser.add_argument('-user', required=True)
     parser.add_argument('-password', required=True)

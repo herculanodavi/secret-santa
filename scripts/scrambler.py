@@ -4,42 +4,54 @@ from person import Person
 from typing import Callable
 
 
-def evaluate_bypass(givers: list[Person], receivers: list[Person]) -> bool:
-    return True
+def bypass_shuffle(givers: list[Person]) -> dict[Person, Person]:
+    return {el: el for el in givers}
 
 
-def evaluate_groups(givers: list[Person], receivers: list[Person]) -> bool:
-    for (g, r) in zip(givers, receivers):
-        if g == r:
-            logging.debug(
-                f"{g.name} and {r.name} are the same person.")
-            return False
-        if len(g.groups.intersection(r.groups)) == 0:
-            logging.debug(
-                f"{g.name} and {r.name} don't have a group in common.")
-            return False
-    return True
+def groups_shuffle(givers: list[Person]) -> dict[Person, Person]:
+    assigned_givers = {}
+
+    def find_random_match(giver: Person):
+        shuffled = np.random.permutation(givers)
+        for r in shuffled:
+            if giver != r and len(giver.groups.intersection(r.groups)) != 0 and r not in assigned_givers:
+                return r
+        return None
+    
+    original_giver = np.random.choice(givers)
+    giver = original_giver
+    receiver = None
+
+    while len(assigned_givers) < len(givers) - 1:
+        receiver = find_random_match(giver)
+        assigned_givers[giver] = receiver
+        giver = receiver
+
+    assigned_givers[giver] = original_giver
+
+    return assigned_givers
 
 
-def get_evaluator(name: str) -> Callable[[list[Person], list[Person]], bool]:
+def get_shuffler(name: str) -> Callable[[list[Person]], dict[Person, Person]]:
     if name == 'groups':
-        return evaluate_groups
+        return groups_shuffle
     elif name == 'bypass':
-        return evaluate_bypass
+        return bypass_shuffle
     raise ValueError(f'Evaluator with name {name} is not implemented.')
 
 
-def scramble(people: list[Person], evaluator: str, num_retries=100) -> dict:
+def solve(people: list[Person], evaluator: str, num_retries=100) -> dict:
     receivers = people.copy()
-    evaluate = get_evaluator(evaluator)
+    solver = get_shuffler(evaluator)
 
-    for _ in range(num_retries):
-        np.random.shuffle(receivers)
-        if (evaluate(people, receivers)):
+    for i in range(num_retries):
+        logging.debug(f"Trying permutation {i + 1}")
+        assignments = solver(receivers)
+        if assignments is not None:
             return [{
-                'giver': g,
-                'receiver': r
-            } for (g, r) in zip(people, receivers)]
+                'giver': k,
+                'receiver': v
+            } for (k, v) in assignments.items()]
 
     raise RuntimeError(
         f"Algorithm did not find a solution. Try again with more retries than {num_retries} or change groups.")
