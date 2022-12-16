@@ -11,7 +11,9 @@ def main(user, password, input_file):
         j = json.load(f)
         people = [Person.from_json(el) for el in j]
         
-    server = mail.DummySender(mail.User(user, password))
+    server = mail.Sender(mail.User(user, password))
+    server.connect()
+
     solution = scrambler.solve(people, 'groups', int(1e6))
     for s in solution:
         server.send_mail(s['giver'], s['receiver'])
@@ -28,5 +30,4 @@ if __name__ == "__main__":
     parser.add_argument('-password', required=True)
     parser.add_argument('-input', required=True)
     args = parser.parse_args()
-    print(args.user, args.password, args.input)
     main(args.user, args.password, args.input)
